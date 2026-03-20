@@ -1,0 +1,167 @@
+.chart-container {
+  background: #1a1a1a;
+  border: 1px solid #2e2e2e;
+  border-radius: 12px;
+  padding: 24px;
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.chart-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.chart-header h2 {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #e0e0e0;
+}
+
+.chart-controls {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.mpan-form {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.mpan-form label {
+  font-size: 0.85rem;
+  color: #888;
+  white-space: nowrap;
+}
+
+.mpan-form input {
+  background: #111;
+  border: 1px solid #2e2e2e;
+  border-radius: 6px;
+  color: #e0e0e0;
+  font-size: 0.85rem;
+  padding: 6px 10px;
+  width: 180px;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.mpan-form input:focus {
+  border-color: #4f8ef7;
+}
+
+.mpan-form button {
+  background: #2e2e2e;
+  border: none;
+  border-radius: 6px;
+  color: #ccc;
+  cursor: pointer;
+  font-size: 0.85rem;
+  padding: 6px 12px;
+  transition: background 0.15s;
+}
+
+.mpan-form button:hover {
+  background: #3a3a3a;
+}
+
+.period-selector {
+  display: flex;
+  gap: 4px;
+  background: #111;
+  border-radius: 8px;
+  padding: 4px;
+}
+
+.period-selector button {
+  background: transparent;
+  border: none;
+  color: #888;
+  padding: 6px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: background 0.15s, color 0.15s;
+}
+
+.period-selector button:hover {
+  color: #ccc;
+}
+
+.period-selector button.active {
+  background: #4f8ef7;
+  color: #fff;
+}
+
+.date-nav {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.date-nav button {
+  background: #2e2e2e;
+  border: none;
+  border-radius: 6px;
+  color: #ccc;
+  cursor: pointer;
+  font-size: 1.2rem;
+  line-height: 1;
+  padding: 4px 12px;
+  transition: background 0.15s;
+}
+
+.date-nav button:hover:not(:disabled) {
+  background: #3a3a3a;
+}
+
+.date-nav button:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.date-nav input[type="date"] {
+  background: #111;
+  border: 1px solid #2e2e2e;
+  border-radius: 6px;
+  color: #e0e0e0;
+  font-size: 0.85rem;
+  padding: 5px 8px;
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.15s;
+  color-scheme: dark;
+}
+
+.date-nav input[type="date"]:focus {
+  border-color: #4f8ef7;
+}
+
+.date-label {
+  font-size: 0.9rem;
+  color: #aaa;
+}
+
+.chart-state {
+  height: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #888;
+  font-size: 0.95rem;
+}
+
+.chart-state.error {
+  color: #f87171;
+}
