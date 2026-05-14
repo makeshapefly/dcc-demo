@@ -1,0 +1,92 @@
+.postcode-lookup {
+  max-width: 480px;
+}
+
+.postcode-lookup h2 {
+  margin: 0 0 6px;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #e0e0e0;
+}
+
+.pl-subtitle {
+  margin: 0 0 28px;
+  color: #888;
+  font-size: 0.9rem;
+}
+
+.pl-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.pl-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.pl-field label {
+  font-size: 0.8rem;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.pl-input-row {
+  display: flex;
+  gap: 8px;
+}
+
+.pl-input-row input {
+  background: #111;
+  border: 1px solid #2e2e2e;
+  border-radius: 8px;
+  color: #e0e0e0;
+  font-size: 0.9rem;
+  padding: 9px 12px;
+  outline: none;
+  transition: border-color 0.15s;
+  width: 180px;
+}
+
+.pl-input-row input:focus {
+  border-color: #4f8ef7;
+}
+
+.pl-input-row input::placeholder {
+  color: #444;
+}
+
+.pl-submit {
+  background: #4f8ef7;
+  border: none;
+  border-radius: 8px;
+  color: #fff;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+  padding: 9px 20px;
+  transition: background 0.15s, opacity 0.15s;
+  white-space: nowrap;
+}
+
+.pl-submit:hover:not(:disabled) {
+  background: #3a7de0;
+}
+
+.pl-submit:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.pl-error {
+  margin-top: 16px;
+  padding: 12px 16px;
+  background: #2a1515;
+  border: 1px solid #5c2222;
+  border-radius: 8px;
+  color: #f87171;
+  font-size: 0.875rem;
+}
