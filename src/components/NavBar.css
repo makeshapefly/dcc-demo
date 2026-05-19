@@ -1,3 +1,35 @@
+/* ── Hamburger (mobile only) ──────────────────────────── */
+.nav-hamburger {
+  display: none;
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  z-index: 200;
+  background: #1a1a1a;
+  border: 1px solid #2e2e2e;
+  border-radius: 8px;
+  color: #ccc;
+  cursor: pointer;
+  font-size: 1.1rem;
+  line-height: 1;
+  padding: 8px 10px;
+  transition: background 0.15s;
+}
+
+.nav-hamburger:hover {
+  background: #2e2e2e;
+}
+
+/* ── Backdrop (mobile only) ───────────────────────────── */
+.nav-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 150;
+}
+
+/* ── Sidebar ──────────────────────────────────────────── */
 .sidebar {
   width: 220px;
   min-width: 220px;
@@ -8,18 +40,38 @@
   height: 100vh;
   position: sticky;
   top: 0;
+  overflow: hidden;
+  transition: width 0.25s ease, min-width 0.25s ease;
+  flex-shrink: 0;
+}
+
+.sidebar.collapsed {
+  width: 56px;
+  min-width: 56px;
+}
+
+/* ── Header (brand + collapse toggle) ────────────────── */
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  padding: 18px 10px 16px 16px;
+  border-bottom: 1px solid #2e2e2e;
+  gap: 6px;
+  flex-shrink: 0;
 }
 
 .sidebar-brand {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 24px 20px 20px;
-  border-bottom: 1px solid #2e2e2e;
+  flex: 1;
+  overflow: hidden;
+  min-width: 0;
 }
 
 .sidebar-brand-icon {
   font-size: 1.3rem;
+  flex-shrink: 0;
 }
 
 .sidebar-brand-text {
@@ -27,8 +79,36 @@
   font-weight: 700;
   color: #e0e0e0;
   letter-spacing: 0.01em;
+  white-space: nowrap;
+  opacity: 1;
+  transition: opacity 0.15s ease;
 }
 
+.sidebar.collapsed .sidebar-brand-text {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.sidebar-collapse-btn {
+  flex-shrink: 0;
+  background: transparent;
+  border: 1px solid #2e2e2e;
+  border-radius: 6px;
+  color: #666;
+  cursor: pointer;
+  font-size: 0.9rem;
+  line-height: 1;
+  padding: 4px 7px;
+  transition: color 0.15s, background 0.15s, border-color 0.15s;
+}
+
+.sidebar-collapse-btn:hover {
+  background: #2e2e2e;
+  color: #ccc;
+  border-color: #444;
+}
+
+/* ── Nav items ────────────────────────────────────────── */
 .sidebar-nav {
   list-style: none;
   margin: 0;
@@ -55,7 +135,9 @@
   font-weight: 500;
   padding: 9px 12px;
   text-align: left;
-  transition: background 0.15s, color 0.15s;
+  transition: background 0.15s, color 0.15s, padding 0.25s, justify-content 0.25s;
+  white-space: nowrap;
+  overflow: hidden;
 }
 
 .sidebar-nav-item:hover {
@@ -68,6 +150,12 @@
   color: #4f8ef7;
 }
 
+.sidebar.collapsed .sidebar-nav-item {
+  justify-content: center;
+  padding: 9px 0;
+  gap: 0;
+}
+
 .nav-icon {
   font-size: 1rem;
   width: 20px;
@@ -77,4 +165,58 @@
 
 .nav-label {
   line-height: 1.3;
+  opacity: 1;
+  transition: opacity 0.15s ease;
+}
+
+.sidebar.collapsed .nav-label {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ── Responsive: mobile ───────────────────────────────── */
+@media (max-width: 767px) {
+  .nav-hamburger {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .nav-backdrop {
+    display: block;
+  }
+
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100dvh;
+    z-index: 160;
+    width: 220px !important;
+    min-width: 220px !important;
+    transform: translateX(-100%);
+    transition: transform 0.25s ease;
+  }
+
+  .sidebar.mobile-open {
+    transform: translateX(0);
+  }
+
+  /* Always show labels on mobile (sidebar is full-width overlay) */
+  .sidebar .sidebar-brand-text,
+  .sidebar .nav-label {
+    opacity: 1 !important;
+    pointer-events: auto !important;
+  }
+
+  .sidebar .sidebar-nav-item {
+    justify-content: flex-start !important;
+    padding: 9px 12px !important;
+    gap: 10px !important;
+  }
+
+  /* Hide the desktop collapse button on mobile */
+  .sidebar-collapse-btn {
+    display: none;
+  }
 }

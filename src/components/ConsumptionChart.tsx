@@ -13,7 +13,7 @@ import {
 type Period = 'day' | 'week' | 'month' | 'year'
 
 interface Reading {
-  time: string
+  period: string
   consumption: string
 }
 
@@ -37,8 +37,6 @@ const PERIODS: { value: Period; label: string }[] = [
   { value: 'year', label: 'Year' },
 ]
 
-const DATA_MIN_DATE = '2026-02-11'
-const DATA_MAX_DATE = '2026-02-13'
 
 function toDateString(date: Date): string {
   return date.toISOString().slice(0, 10)
@@ -63,14 +61,18 @@ function buildUrl(period: Period, mpan: string, selectedDate: string): string {
   let to: Date
 
   if (period === 'day') {
-    from = new Date(`${selectedDate}T00:00:00.000Z`)
-    to = new Date(from)
+    from = new Date(`${selectedDate}T01:00:00.000Z`)
+    to   = new Date(`${selectedDate}T01:00:00.000Z`)
     to.setUTCDate(to.getUTCDate() + 1)
+  } else if (period === 'week') {
+    from = new Date(`${selectedDate}T00:00:00.000Z`)
+    from.setUTCDate(from.getUTCDate() + 1)
+    to = new Date(from)
+    to.setUTCDate(to.getUTCDate() + 6)
   } else {
     to = new Date()
     from = new Date(to)
-    if (period === 'week') from.setDate(to.getDate() - 7)
-    else if (period === 'month') from.setMonth(to.getMonth() - 1)
+    if (period === 'month') from.setMonth(to.getMonth() - 1)
     else from.setFullYear(to.getFullYear() - 1)
   }
 
@@ -85,12 +87,30 @@ function buildUrl(period: Period, mpan: string, selectedDate: string): string {
   return `${base}/electricity-consumption?${params}`
 }
 
-function formatLabel(time: string, period: Period): string {
-  const date = new Date(time)
+function parseApiTime(time: string | undefined | null): Date {
+  if (!time) return new Date(NaN)
+  // API returns "YYYY-MM-DD HH:MM:SS.ffffff+HH" — not valid ISO 8601.
+  // Normalise to "YYYY-MM-DDTHH:MM:SS.ffffff+HH:00" so all engines parse it correctly.
+  return new Date(
+    time.replace(' ', 'T').replace(/([+-]\d{2})$/, '$1:00')
+  )
+}
+
+function formatLabel(time: string | undefined | null, period: Period): string {
+  const date = parseApiTime(time)
+  if (isNaN(date.getTime())) return ''
   if (period === 'day') return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-  if (period === 'week') return date.toLocaleDateString([], { weekday: 'short', day: 'numeric' })
-  if (period === 'month') return date.toLocaleDateString([], { day: 'numeric', month: 'short' })
-  return date.toLocaleDateString([], { month: 'short', year: '2-digit' })
+  if (period === 'week') return date.toLocaleDateString([], { weekday: 'short', day: 'numeric', timeZone: 'UTC' })
+  if (period === 'month') return date.toLocaleDateString([], { day: 'numeric', month: 'short', timeZone: 'UTC' })
+  return date.toLocaleDateString([], { month: 'short', year: '2-digit', timeZone: 'UTC' })
+}
+
+function formatWeekRange(startDateStr: string): string {
+  const from = new Date(`${startDateStr}T00:00:00.000Z`)
+  const to = new Date(from)
+  to.setUTCDate(to.getUTCDate() + 6)
+  const opts: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'short', timeZone: 'UTC' }
+  return `${from.toLocaleDateString([], opts)} – ${to.toLocaleDateString([], { ...opts, year: 'numeric' })}`
 }
 
 function formatDisplayDate(dateStr: string): string {
@@ -101,7 +121,7 @@ function formatDisplayDate(dateStr: string): string {
 
 export function ConsumptionChart() {
   const [period, setPeriod] = useState<Period>('day')
-  const [selectedDate, setSelectedDate] = useState(DATA_MAX_DATE)
+  const [selectedDate, setSelectedDate] = useState(toDateString(new Date()))
   const [mpan, setMpan] = useState(import.meta.env.VITE_MPAN ?? '')
   const [mpanInput, setMpanInput] = useState(import.meta.env.VITE_MPAN ?? '')
   const [data, setData] = useState<ChartDataPoint[]>([])
@@ -122,9 +142,9 @@ export function ConsumptionChart() {
         return res.json() as Promise<ApiResponse>
       })
       .then(({ readings }) => {
-        setData(
+setData(
           readings.map(r => ({
-            label: formatLabel(r.time, period),
+            label: formatLabel(r.period, period),
             consumption: parseFloat(r.consumption),
           }))
         )
@@ -133,14 +153,26 @@ export function ConsumptionChart() {
       .finally(() => setLoading(false))
   }, [period, mpan, selectedDate])
 
-  function handleMpanSubmit(e: React.FormEvent) {
+  function handleMpanSubmit(e: React.SyntheticEvent<HTMLFormElement>) {
     e.preventDefault()
     setMpan(mpanInput.trim())
   }
 
+  function handlePeriodChange(p: Period) {
+    if (p === 'week') {
+      const d = new Date()
+      d.setUTCDate(d.getUTCDate() - 7)
+      setSelectedDate(toDateString(d))
+    } else if (p === 'day') {
+      setSelectedDate(toDateString(new Date()))
+    }
+    setPeriod(p)
+  }
+
   function stepDate(direction: -1 | 1) {
     const d = new Date(`${selectedDate}T00:00:00.000Z`)
-    d.setUTCDate(d.getUTCDate() + direction)
+    const days = period === 'week' ? 7 : 1
+    d.setUTCDate(d.getUTCDate() + direction * days)
     setSelectedDate(toDateString(d))
   }
 
@@ -166,7 +198,7 @@ export function ConsumptionChart() {
               <button
                 key={p.value}
                 className={period === p.value ? 'active' : ''}
-                onClick={() => setPeriod(p.value)}
+                onClick={() => handlePeriodChange(p.value)}
               >
                 {p.label}
               </button>
@@ -175,30 +207,24 @@ export function ConsumptionChart() {
         </div>
       </div>
 
+      {period === 'week' && (
+        <div className="date-nav">
+          <button onClick={() => stepDate(-1)} aria-label="Previous week">‹</button>
+          <span className="date-label">{formatWeekRange(selectedDate)}</span>
+          <button onClick={() => stepDate(1)} aria-label="Next week">›</button>
+        </div>
+      )}
+
       {period === 'day' && (
         <div className="date-nav">
-          <button
-            onClick={() => stepDate(-1)}
-            disabled={selectedDate <= DATA_MIN_DATE}
-            aria-label="Previous day"
-          >
-            ‹
-          </button>
+          <button onClick={() => stepDate(-1)} aria-label="Previous day">‹</button>
           <input
             type="date"
             value={selectedDate}
-            min={DATA_MIN_DATE}
-            max={DATA_MAX_DATE}
             onChange={e => setSelectedDate(e.target.value)}
           />
           <span className="date-label">{formatDisplayDate(selectedDate)}</span>
-          <button
-            onClick={() => stepDate(1)}
-            disabled={selectedDate >= DATA_MAX_DATE}
-            aria-label="Next day"
-          >
-            ›
-          </button>
+          <button onClick={() => stepDate(1)} aria-label="Next day">›</button>
         </div>
       )}
 
