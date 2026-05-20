@@ -247,7 +247,7 @@ setData(
               tick={{ fontSize: 12 }}
             />
             <Tooltip
-              formatter={(value: number) => [`${value.toFixed(3)} kWh`, 'Consumption']}
+              formatter={(value) => [`${Number(value).toFixed(3)} kWh`, 'Consumption']}
             />
             <Bar dataKey="consumption" fill="#4f8ef7" radius={[3, 3, 0, 0]} />
           </BarChart>
