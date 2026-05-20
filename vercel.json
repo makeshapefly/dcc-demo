@@ -1,0 +1,12 @@
+{
+  "rewrites": [
+    {
+      "source": "/oauth/:path*",
+      "destination": "https://dev-1h0nu8s4gpsghldn.uk.auth0.com/oauth/:path*"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}
